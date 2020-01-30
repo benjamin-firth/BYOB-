@@ -10,12 +10,6 @@ app.listen(app.get('port'), () => {
   console.log(`App is running on http://localhost:${app.get('port')}.`)
 });
 
-// app.get('/api/v1/manufacturers', (request, response) => {
-//   database('manufacturers').select()
-//     .then(manufacturers => response.status(200).json(manufacturers))
-//     .catch(error => response.status(500).json({ error }))
-// });
-
 app.get('/api/v1/manufacturers', async (request, response) => {
   try {
     const manufacturers = await database('manufacturers').select();
@@ -87,7 +81,6 @@ app.post('/api/v1/cereals', (request, response) => {
   const cereal = request.body;
 
   for (let requiredParameter of ['name', 'mfr', 'type', 'calories', 'protein', 'fat', 'sodium', 'fiber', 'carbo', 'sugars', 'potass', 'vitamins', 'shelf', 'weight', 'cups', 'rating']) {
-    console.log('made it mutha fucka', cereal[requiredParameter]);
     if(!cereal[requiredParameter] && cereal[requiredParameter] !== 0) {
       return response
         .status(422)
@@ -111,14 +104,23 @@ app.post('/api/v1/cereals', (request, response) => {
            }. You're missing a "${requiredParameter}" property.` })
     }
   }
-  console.log('out of the for loop');
+
   database('cereals').insert(cereal, 'id')
     .then(cereal => {
-      console.log('in the 201');
       response.status(201).json({ id: cereal[0] })
     })
     .catch(error => {
-      console.log('500 down herrrrrr');
       response.status(500).json({ error })
     });
+});
+
+app.delete('/api/v1/cereals/:id', async (request, response) => {
+  const { id } = request.params;
+
+  await database('cereals').where('id', id).del()
+    try {
+      response.status(204).json();
+    } catch (error) {
+      response.status(500).json({ error });
+    }
 });
