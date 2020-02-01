@@ -13,35 +13,28 @@ app.listen(app.get('port'), () => {
 app.get('/api/v1/manufacturers', async (request, response) => {
   try {
     const manufacturers = await database('manufacturers').select();
-    response.status(200).json({ manufacturers }):
+    response.status(200).json({ manufacturers });
 
   } catch (error) {
-    response.status(500).json({ error }):
+    response.status(500).json({ error });
   }
 });
 
 app.get('/api/v1/cereals', async (request, response) => {
   try {
     const cereals = await database('cereals').select();
-    response.status(200).json({ cereals }):
+    response.status(200).json({ cereals });
   } catch (error) {
-    response.stuatus(500).json({ error }):
+    response.stuatus(500).json({ error });
   }
 });
 
-// app.get('/api/v1/cereals', (request, response) => {
-//   database('cereals').select()
-//     .then(cereals => response.status(200).json(cereals))
-//     .catch(error => response.status(500).json({ error }))
-// });
-
 app.get('/api/v1/manufacturers/:id', async (request, response) => {
   const { id } = request.params;
-
   try {
     const manufacturer = await database('manufacturers').where('id', id).select();
     manufacturer.length 
-      ? response.status(200).json(manufacturer) 
+      ? response.status(200).json(manufacturer[0]) 
       : response.status(404).json({
         error: `Could not find manufacturer with the id: ${id}`
       });
@@ -50,36 +43,18 @@ app.get('/api/v1/manufacturers/:id', async (request, response) => {
   }
 });
 
-// app.get('/api/v1/manufacturers/:id', (request, response) => {
-//   const { id } = request.params;
-
-//   database('manufacturers').where('id', id).select()
-//     .then(manufacturers => {
-//       manufacturers.length 
-//         ? response.status(200).json(manufacturers) 
-//         : response.status(404).json({
-//           error: `Could not find manufacturer with the id: ${id}`
-//         });
-//     })
-//     .catch(error => {
-//       response.status(500).json({ error });
-//     });
-// });
-
-app.get('/api/v1/cereals/:id', (request, response) => {
+app.get('/api/v1/cereals/:id', async (request, response) => {
   const { id } = request.params;
-
-  database('cereals').where('id', id).select()
-    .then(cereals => {
-      cereals.length 
-        ? response.status(200).json(cereals) 
-        : response.status(404).json({
-          error: `Could not find cereal with the id: ${id}`
-        });
-    })
-    .catch(error => {
-      response.status(500).json({ error });
-    });
+  try {
+    const cereal = await database('cereals').where('id', id).select();
+    cereal.length
+      ? response.status(200).json(cereal[0])
+      : response.status(404).json({
+        error: `Could not find cereal with the id: ${id}`
+      });
+  } catch (error) {
+    response.status(500).json({ error });
+  }
 });
 
 app.post('/api/v1/manufacturers', (request, response) => {
